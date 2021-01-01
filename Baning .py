@@ -1,5 +1,4 @@
-#mylife
-#Hello Rituraj
+
 import mysql.connector
 import  os
 import getpass
@@ -18,7 +17,7 @@ except:
 
 mycursor=mydb.cursor(buffered=True)
 #Created Database bankDB
-mycursor.execute('create database if not exists bankDB')
+mycursor.execute('create database if not exists BankDB')
 mycursor.execute('use BankDB')
 
 
