@@ -1,5 +1,4 @@
-#itmylife
-#Hello again
+
 import mysql.connector
 import  os
 import getpass
