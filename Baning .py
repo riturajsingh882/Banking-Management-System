@@ -28,28 +28,38 @@ def Menu(): #Function to display the menu
     print("MAIN MENU".center(130))
     print("1. Insert Record/Records".center(130))
     print("2. Display Records as per Account Number".center(130))
-    print(" a. Sorted as per Account Number".center(130))
-    print(" b. Sorted as per Customer Name".center(130))
-    print(" c. Sorted as per Customer Balance".center(130))
     print("3. Search Record Details as per the account number".center(130))
     print("4. Update Record".center(130))
     print("5. Delete Record".center(130))
-    print("6. TransactionsDebit/Withdraw from theaccount".center(130))
-    print(" a. Debit/Withdraw from the account".center(130))
-    print(" b. Credit into the account".center(130))
+    print("6. TransactionsDebit/Withdraw from the account".center(130))
     print("7. Exit".center(130))
     print("*"*130)
+
+    def displayMenu():
+        print("*"*130)
+        print(" a. Sorted as per Account Number".center(130))
+        print(" b. Sorted as per Customer Name".center(130))
+        print(" c. Sorted as per Customer Balance".center(130))
+        print("*"*130)
+
+    def transactionMenu():
+        print("*"*130)
+        print(" a. Debit/Withdraw from the account".center(130))
+        print(" b. Credit into the account".center(130))
+        print("*"*130)
 
 def MenuSort():
     print(" a. Sorted as per Account Number".center(130))
     print(" b. Sorted as per Customer Name".center(130))
     print(" c. Sorted as per Customer Balance".center(130))
     print(" d. Back".center(130))
-
+    print("*"*130)
+    
 def MenuTransaction():
     print(" a. Debit/Withdraw from the account".center(130))
     print(" b. Credit into the account".center(130))
     print(" c. Back".center(130))
+    print("*"*130)
 
 def Create():
     try:
@@ -173,38 +183,38 @@ def Update(): #Function to change the details of a customer
         for i in S:
             i=list(i)
             if i[0]==A:
-                ch=input("Change Name(Y/N)")
-                if ch=='y' or ch=='Y':
-                    i[1]=input("Enter Name")
+                ch=input("Change Name(Y/N) : ")
+                if ch=='y' or ch=='Y':  
+                    i[1]=input("Enter Name : ")
                     i[1]=i[1].upper()
                     
-                ch=input("Change Mobile(Y/N)")
+                ch=input("Change Mobile(Y/N) : ")
                 if ch=='y' or ch=='Y':
-                    i[2]=input("Enter Mobile")
+                    i[2]=input("Enter Mobile : ")
 
-                ch=input("Change Email(Y/N)")
+                ch=input("Change Email(Y/N) : ")
                 if ch=='y' or ch=='Y':
-                    i[3]=input("Enter email")
+                    i[3]=input("Enter email : ")
                     i[3]=i[3].upper()
 
-                ch=input("Change Address(Y/N)")
+                ch=input("Change Address(Y/N) : ")
                 if ch=='y' or ch=='Y':
-                    i[4]=input("Enter Address")
+                    i[4]=input("Enter Address : ")
                     i[4]=i[4].upper()
 
-                ch=input("Change city(Y/N)")
+                ch=input("Change city(Y/N) : ")
                 if ch=='y' or ch=='Y':
-                    i[5]=input("Enter City")
+                    i[5]=input("Enter City : ")
                     i[5]=i[5].upper()
 
-                ch=input("Change Country(Y/N)")
+                ch=input("Change Country(Y/N) : ")
                 if ch=='y' or ch=='Y':
-                    i[6]=input("Enter country")
+                    i[6]=input("Enter country : ")
                     i[6]=i[6].upper()
                     
-                ch=input("Change Balance(Y/N)")
+                ch=input("Change Balance(Y/N) : ")
                 if ch=='y' or ch=='Y':
-                    i[7]=float(input("Enter Balance"))
+                    i[7]=float(input("Enter Balance : "))
                 cmd="UPDATE bank SET NAME=%s,MOBILE=%s,EMAIL=%s,ADDRESS=%s,CITY=%s,COUNTRY=%s,BALANCE=%s WHERE ACCNO=%s"
                 val=(i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[0])
                 mycursor.execute(cmd,val)
@@ -221,7 +231,7 @@ def Delete():#Function to delete the details of a customer
         cmd="select * from bank"
         mycursor.execute(cmd)
         S=mycursor.fetchall()
-        A=input("Enter the accound no whose details to be changed")
+        A=input("Enter the accound no whose details to be changed : ")
         for i in S:
             i=list(i)
             if i[0]==A:
@@ -293,7 +303,7 @@ def Credit(): #Function to Withdraw the amount by assuring the minvbalance of Rs
 
 while True:
     Menu()
-    ch=input("Enter your Choice")
+    ch=input("Enter your Choice : ")
     if ch=="1":
         Create()
     elif ch=="2":
