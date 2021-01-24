@@ -4,7 +4,10 @@ import  os
 import getpass
 
 def  clear():
-    os.system("cls")               
+    if os.name == "nt":
+        os.system("cls")               
+    else:
+        os.system("clear")
 
 usr = input("Enter your MySQL Username : ")
 pas = getpass.getpass("Enter your MySQL Password : ")
@@ -24,8 +27,9 @@ mycursor.execute('use BankDB')
 
 
 def Menu(): #Function to display the menu
+    clear()
     print("*"*130)
-    print("MAIN MENU".center(130))
+    print("MAIN MENU\n".center(130))
     print("1. Insert Record/Records".center(130))
     print("2. Display Records as per Account Number".center(130))
     print("3. Search Record Details as per the account number".center(130))
@@ -35,20 +39,10 @@ def Menu(): #Function to display the menu
     print("7. Exit".center(130))
     print("*"*130)
 
-    def displayMenu():
-        print("*"*130)
-        print(" a. Sorted as per Account Number".center(130))
-        print(" b. Sorted as per Customer Name".center(130))
-        print(" c. Sorted as per Customer Balance".center(130))
-        print("*"*130)
-
-    def transactionMenu():
-        print("*"*130)
-        print(" a. Debit/Withdraw from the account".center(130))
-        print(" b. Credit into the account".center(130))
-        print("*"*130)
-
 def MenuSort():
+    clear()
+    print("*"*130)
+    print("MAIN MENU>>>DISPLAY RECORDS\n".center(130))
     print(" a. Sorted as per Account Number".center(130))
     print(" b. Sorted as per Customer Name".center(130))
     print(" c. Sorted as per Customer Balance".center(130))
@@ -56,26 +50,24 @@ def MenuSort():
     print("*"*130)
     
 def MenuTransaction():
+    clear()
+    print("*"*130)
+    print("MAIN MENU>>>TRANSACTIONS\n".center(130))
     print(" a. Debit/Withdraw from the account".center(130))
     print(" b. Credit into the account".center(130))
     print(" c. Back".center(130))
     print("*"*130)
 
 def Create():
-    try:
-        mycursor.execute('create table bank(ACCNO varchar(16),NAME varchar(50),MOBILE varchar(10),EMAIL varchar(50),ADDRESS varchar(100),CITY varchar(50),COUNTRY varchar(20),BALANCE decimal(50,2))')
-        print("Table Created")
-        Insert()
-
-    except:
-        print("Table Exist")
-        Insert()
-    
+    mycursor.execute('create table if not exists bank(ACCNO varchar(16),NAME varchar(50),MOBILE varchar(10),EMAIL varchar(50),ADDRESS varchar(100),CITY varchar(50),COUNTRY varchar(20),BALANCE decimal(50,2))')
+    Insert()
 
         
 
 def Insert():
-    
+    clear()
+    print("*"*130)
+    print("MAIN MENU>>>INSERT RECORDS".center(130))
     while True:  #Loop for accepting records
         Acc=input("Enter account no : ")
         Name=input("Enter Name : ")
@@ -89,13 +81,13 @@ def Insert():
         #Rec=[Acc,Name.upper(),Mob,email.upper(),Add.upper(),City.upper(),Country.upper(),Bal]
         Cmd=f"insert into bank values('{Acc}','{Name.upper()}','{Mob}','{email}','{Add.upper()}','{City.upper()}','{Country.upper()}','{Bal}');"
         mycursor.execute(Cmd)
-        mycursor.fetchall()
-        mycursor.commit()
+        #mycursor.fetchall()
+        mydb.commit()
         print("The values have been entered Succesfully!")
-        ch=input("Do you want to enter more records")
-        if ch=='N' or ch=='n':
-            break
-
+        ch=input("Do you want to enter more records(Y/n) : ")
+        if ch=='y' or ch=='Y':
+            continue
+    print("*"*130)
         #Function to Display records as per ascending order of Account Number 
 
 def DispSortAcc():
@@ -179,7 +171,7 @@ def Update(): #Function to change the details of a customer
         cmd="select * from bank"
         mycursor.execute(cmd)
         S=mycursor.fetchall()
-        A=input("Enter the accound no whose details to be changed")
+        A=input("Enter the account no whose details to be changed")
         for i in S:
             i=list(i)
             if i[0]==A:
@@ -231,11 +223,11 @@ def Delete():#Function to delete the details of a customer
         cmd="select * from bank"
         mycursor.execute(cmd)
         S=mycursor.fetchall()
-        A=input("Enter the accound no whose details to be changed : ")
+        A=input("Enter the accound no whose details to be removed: ")
         for i in S:
             i=list(i)
             if i[0]==A:
-                cmd="delete from bank where accno=%s"
+                cmd="delete from bank where accno={A}"
                 val=(i[0],)
                 mycursor.execute(cmd,val)
                 mydb.commit()
@@ -261,7 +253,7 @@ def Debit(): #Function to Withdraw the amount by assuring the minbalance of Rs 5
                 Amt=float(input("Enter the amount to be withdrawn"))
                 if i[7]-Amt>=5000:
                     i[7]-=Amt
-                    cmd="UPDATE bank SET BALANCE=%s WHERE ACCNO=%s"
+                    cmd=f"UPDATE bank SET BALANCE={Amt} WHERE ACCNO={acc}"
                     val=(i[7],i[0])
                     mycursor.execute(cmd,val)
                     mydb.commit()
@@ -289,7 +281,7 @@ def Credit(): #Function to Withdraw the amount by assuring the minvbalance of Rs
                 if i[0]==acc:
                     Amt=float(input("Enter the amount to be credited"))
                     i[7]+=Amt
-                    cmd="UPDATE bank SET BALANCE=%s WHERE ACCNO=%s"
+                    cmd=f"UPDATE bank SET BALANCE={Amt} WHERE ACCNO={acc}"
                     val=(i[7],i[0])
                     mycursor.execute(cmd,val)
                     mydb.commit()
@@ -307,9 +299,10 @@ while True:
     if ch=="1":
         Create()
     elif ch=="2":
-        while True:
+        #while True:
             MenuSort()
-            ch1=input("Enter Choice a/b/c/d")
+            ch1=input("Enter Choice a/b/c/d : ")
+            clear()
             if ch1 in ['a','A']:
                 DispSortAcc()
             elif ch1 in ['b','B']:
@@ -317,10 +310,10 @@ while True:
             elif ch1 in ['c','C']:
                 DispSortBal()
             elif ch1 in ['d','D']:
-                print("Back to the main menu")
                 break
             else:
                 print("Invalid choice")
+            input("Press enter to continue.")
     elif ch=="3":
         DispSearchAcc()
     elif ch=="4":
@@ -330,16 +323,17 @@ while True:
     elif ch=="6":
         while True:
             MenuTransaction()
-            ch1=input("Enter choice a/b/c")
+            ch1=input("Enter choice a/b/c : ")
+            clear
             if ch1 in ['a','A']:
                 Debit()
             elif ch1 in ['b','B']:
                 Credit()
             elif ch1 in ['c','C']:
-                print("Back to the main menu")
                 break
             else:
                 print("Invalid choice")
+            input("Press enter to continue.")
 
     elif ch=="7":
         print("Exiting...")
