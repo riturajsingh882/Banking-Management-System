@@ -1,4 +1,3 @@
-
 import mysql.connector
 import  os
 import getpass
@@ -10,8 +9,13 @@ def  clear():
     else:
         os.system("clear")
 
-usr = input("Enter your MySQL Username : ")
+usr = input("Enter your MySQL Username(root) : ")
+
+if usr=='':
+    usr="root"
+
 pas = getpass.getpass("Enter your MySQL Password : ")
+
 try:
     mydb=mysql.connector.connect(user=usr,passwd= pas,host='localhost')
 
@@ -19,15 +23,40 @@ except:
     print("Failed to connect to Mysql! Please make sure that the given credentials are valid.")
     exit()
 
-mycursor=mydb.cursor(buffered=True)
+mycursor = mydb.cursor(buffered=True)
 #Created Database bankDB
 mycursor.execute('create database if not exists BankDB')
 mycursor.execute('use BankDB')
 
+            
+def password():
+    try: 
+        mycursor.execute("select pass from password")
+        data = mycursor.fetchall()
+        return data[0][0]
+
+    except:
+        while True:
+            print("Enter your new authentication password : ")
+            pas = getpass.getpass()
+            print("Confirm your password : ")
+            pas2 = getpass.getpass()
+
+            if pas != pas2:
+                print("The two passwords did not match, please try again!")
+
+            else:
+                mycursor.execute("create table if not exists password(pass varchar(100));")
+                mycursor.execute(f"insert into password values('{pas}');")
+                mydb.commit()
+                print("Password added successfully!")
+                break
+        
+password()
 
 
-
-def Menu(): #Function to display the menu
+#Function to display the menu
+def Menu(): 
     clear()
     print("*"*130)
     print("MAIN MENU\n".center(130))
@@ -37,9 +66,12 @@ def Menu(): #Function to display the menu
     print("4. Update Record".center(130))
     print("5. Delete Record".center(130))
     print("6. TransactionsDebit/Withdraw from the account".center(130))
-    print("7. Exit".center(130))
+    print("7. Change Password".center(130))
+    print("8. Exit".center(130))
     print("*"*130)
 
+
+#Function to display the menu sorted-ly
 def MenuSort():
     clear()
     print("*"*130)
@@ -50,6 +82,8 @@ def MenuSort():
     print(" d. Back".center(130))
     print("*"*130)
     
+
+#Function to display the transactions menu
 def MenuTransaction():
     clear()
     print("*"*130)
@@ -59,18 +93,28 @@ def MenuTransaction():
     print(" c. Back".center(130))
     print("*"*130)
 
+
+#Function to create the main table
 def Create():
     mycursor.execute('create table if not exists bank(ACCNO varchar(16),NAME varchar(50),MOBILE varchar(10),EMAIL varchar(50),ADDRESS varchar(100),CITY varchar(50),COUNTRY varchar(20),BALANCE decimal(50,2))')
     Insert()
 
-        
-
+#Function to insert records into the table
 def Insert():
     clear()
     print("*"*130)
     print("MAIN MENU>>>INSERT RECORDS".center(130))
     print("*"*130)
-    while True:  #Loop for accepting records
+    print("Please enter your authentication password to continue!")
+    pas = getpass.getpass()
+    if pas == password():
+        print("Authentication successful!")
+    
+    else:
+        input("The given password is incorrect! Please press enter to return to main menu.")
+        return
+    #Loop for accepting records
+    while True:  
         Acc=input("Enter account no : ")
         Name=input("Enter Name : ")
         Mob=input("Enter Mobile : ")
@@ -85,13 +129,14 @@ def Insert():
         mycursor.execute(Cmd)
         #mycursor.fetchall()
         mydb.commit()
-        print("The values have been entered Succesfully!")
+        print("The values have been entered Successfully!")
         ch=input("Do you want to enter more records(Y/n) : ")
         if ch=='y' or ch=='Y':
             continue
+        break
     
-        #Function to Display records as per ascending order of Account Number 
-
+    
+#Function to Display records as per ascending order of Account Number 
 def DispSortAcc():
     try:
         cmd="select * from bank order by ACCNO"
@@ -108,7 +153,9 @@ def DispSortAcc():
     except:
         print("Table doesn't exist")
 
-def DispSortName(): #Function to Display records as per ascending order of Name
+
+#Function to Display records as per ascending order of Name
+def DispSortName(): 
     try:
         cmd="select * from bank order by NAME"
         mycursor.execute(cmd)
@@ -121,14 +168,12 @@ def DispSortName(): #Function to Display records as per ascending order of Name
                 print("%14s" % j, end=' ')
             print()
         print("="*125)
-        clear()
     except:
         print("Table doesn't exist")
 
-        clear()
-        
-        
-def DispSortBal():      #Function to Display records as per ascending order of Balance
+
+#Function to Display records as per ascending order of Balance
+def DispSortBal():      
     try:
         cmd="select * from bank order by BALANCE"
         mycursor.execute(cmd)
@@ -145,12 +190,13 @@ def DispSortBal():      #Function to Display records as per ascending order of B
         print("Table doesn't exist")
 
 
-def DispSearchAcc(): #Function to Search for the Record from the Filewith respect to the account number
+ #Function to Search for the Record from the Filewith respect to the account number
+def DispSearchAcc():
     try:
         cmd="select * from bank"
         mycursor.execute(cmd)
         S=mycursor.fetchall()
-        ch=input("Enter the accountno to be searched")    
+        ch=input("Enter the account no to be searched")    
         for i in S:
 
             if i[0]==ch:
@@ -168,7 +214,8 @@ def DispSearchAcc(): #Function to Search for the Record from the Filewith respec
     except:
         print("Table doesn't exist")
 
-def Update(): #Function to change the details of a customer    
+#Function to change the details of a customer    
+def Update(): 
     print("*"*130)
     print("MAIN MENU>>>UPDATE RECORDS\n".center(130))  
     print("*"*130)
@@ -212,7 +259,7 @@ def Update(): #Function to change the details of a customer
                 ch=input("Change Balance(Y/N) : ")
                 if ch=='y' or ch=='Y':
                     i[7]=float(input("Enter Balance : "))
-                cmd=f"UPDATE bank SET NAME={i[1]},MOBILE={i[2]},EMAIL={i[3]},ADDRESS={i[4]},CITY={i[5]},COUNTRY={i[6]},BALANCE={i[7]} WHERE ACCNO={i[0]}"
+                cmd=f"UPDATE bank SET NAME='{i[1]}',MOBILE='{i[2]}',EMAIL='{i[3]}',ADDRESS='{i[4]}',CITY='{i[5]}',COUNTRY='{i[6]}',BALANCE={i[7]} WHERE ACCNO='{i[0]}';"
                 #val=(i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[0])
                 mycursor.execute(cmd)
                 mydb.commit()
@@ -223,12 +270,14 @@ def Update(): #Function to change the details of a customer
     except:
         print("No such table")
 
-def Delete():#Function to delete the details of a customer
+
+#Function to delete the details of a customer
+def Delete():
     try:
         cmd="select * from bank"
         mycursor.execute(cmd)
         S=mycursor.fetchall()
-        A=input("Enter the accound no whose details to be removed: ")
+        A=input("Enter the account no whose details to be removed: ")
         for i in S:
             i=list(i)
             if i[0]==A:
@@ -245,7 +294,9 @@ def Delete():#Function to delete the details of a customer
     except:
         print("No such Table")
 
-def Debit(): #Function to Withdraw the amount by assuring the minbalance of Rs 5000
+
+#Function to Withdraw the amount by assuring the minbalance of Rs 5000
+def Debit(): 
     try:
         cmd="select * from bank"
         mycursor.execute(cmd)
@@ -274,8 +325,9 @@ def Debit(): #Function to Withdraw the amount by assuring the minbalance of Rs 5
     except:
         print("Table Doesn't exist")
 
-    
-def Credit(): #Function to Withdraw the amount by assuring the minvbalance of Rs 5000
+
+#Function to Withdraw the amount by assuring the minvbalance of Rs 5000   
+def Credit(): 
     try:
             cmd="select * from bank"
             mycursor.execute(cmd)
@@ -298,6 +350,8 @@ def Credit(): #Function to Withdraw the amount by assuring the minvbalance of Rs
     except:
         print("Table Doesn't exist")
 
+
+#while loop that calls the main menu!
 while True:
     Menu()
     ch=input("Enter your Choice : ")
@@ -327,20 +381,32 @@ while True:
         print("MAIN MENU>>>SEARCH RECORDS\n".center(130))
         print("*"*130)
         DispSearchAcc()
-
+        
     elif ch=="4":
         clear()
         print("*"*130)
         print("MAIN MENU>>>UPDATE RECORDS\n".center(130))
         print("*"*130)
-        Update()
+        print("Please enter your authentication password to continue!")
+        pas = getpass.getpass()
+        if pas == password():
+            Update()
+        
+        else:
+            input("The given password is incorrect! Please press enter to return to main menu.")
 
     elif ch=="5":
         clear()
         print("*"*130)
         print("MAIN MENU>>>DELETE RECORDS\n".center(130))
         print("*"*130)
-        Delete()
+        print("Please enter your authentication password to continue!")
+        pas = getpass.getpass()
+        if pas == password():
+            Delete()
+        
+        else:
+            input("The given password is incorrect! Please press enter to return to main menu.")
 
     elif ch=="6":
         while True:
@@ -350,12 +416,24 @@ while True:
             if ch1 in ['a','A']:
                 print("*"*130)
                 print("MAIN MENU>>>TRANSACTIONS>>>DEBIT\n".center(130))
-                Debit()
+                print("Please enter your authentication password to continue!")
+                pas = getpass.getpass()
+                if pas == password():
+                    Debit()
+                
+                else:
+                    input("The given password is incorrect! Please press enter to return to main menu.")
 
             elif ch1 in ['b','B']:
                 print("*"*130)
                 print("MAIN MENU>>>TRANSACTIONS>CREDIT\n".center(130))
-                Credit()
+                print("Please enter your authentication password to continue!")
+                pas = getpass.getpass()
+                if pas == password():
+                    Credit()
+                
+                else:
+                    input("The given password is incorrect! Please press enter to return to main menu.")
 
             elif ch1 in ['c','C']:
                 break
@@ -365,8 +443,44 @@ while True:
             input("Press enter to continue.")
 
     elif ch=="7":
+        clear()
+        print("*"*130)
+        print("MAIN MENU>>>CHANGE PASSWORD\n".center(130))
+        print("*"*130)
+        x=input("Do you want to update your authentication password? Y/N: ")
+        if x.lower()=='y':
+            print("Please enter your current password.")
+            pas = getpass.getpass()
+            if pas == password():
+                print("Enter your new authentication password.")
+                npas = getpass.getpass()
+                print("Confirm your password.")
+                npas2 = getpass.getpass()
+
+                if npas != npas2:
+                    print("The two passwords did not match, please try again later!")
+                    continue
+            
+                else:
+                    mycursor.execute(f"update password set pass = '{npas}' where pass = '{pas}';")
+                    mydb.commit()
+                
+            else:
+                print("The entered password is incorrect! Please enter the correct password and try again!")
+                
+        elif x.lower()=='n':
+            print("Ok!")
+            continue
+
+        else:
+            print("Wrong Choice Entered")
+            continue
+        input("Press enter to continue.")
+
+    elif ch=="8":
         print("Exiting...")
         break
 
     else:
         print("Wrong Choice Entered")
+        continue
