@@ -68,6 +68,7 @@ def Insert():
     clear()
     print("*"*130)
     print("MAIN MENU>>>INSERT RECORDS".center(130))
+    print("*"*130)
     while True:  #Loop for accepting records
         Acc=input("Enter account no : ")
         Name=input("Enter Name : ")
@@ -87,7 +88,7 @@ def Insert():
         ch=input("Do you want to enter more records(Y/n) : ")
         if ch=='y' or ch=='Y':
             continue
-    print("*"*130)
+    
         #Function to Display records as per ascending order of Account Number 
 
 def DispSortAcc():
@@ -166,7 +167,10 @@ def DispSearchAcc(): #Function to Search for the Record from the Filewith respec
     except:
         print("Table doesn't exist")
 
-def Update(): #Function to change the details of a customer        
+def Update(): #Function to change the details of a customer    
+    print("*"*130)
+    print("MAIN MENU>>>UPDATE RECORDS\n".center(130))  
+    print("*"*130)
     try:
         cmd="select * from bank"
         mycursor.execute(cmd)
@@ -207,9 +211,9 @@ def Update(): #Function to change the details of a customer
                 ch=input("Change Balance(Y/N) : ")
                 if ch=='y' or ch=='Y':
                     i[7]=float(input("Enter Balance : "))
-                cmd="UPDATE bank SET NAME=%s,MOBILE=%s,EMAIL=%s,ADDRESS=%s,CITY=%s,COUNTRY=%s,BALANCE=%s WHERE ACCNO=%s"
-                val=(i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[0])
-                mycursor.execute(cmd,val)
+                cmd=f"UPDATE bank SET NAME={i[1]},MOBILE={i[2]},EMAIL={i[3]},ADDRESS={i[4]},CITY={i[5]},COUNTRY={i[6]},BALANCE={i[7]} WHERE ACCNO={i[0]}"
+                #val=(i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[0])
+                mycursor.execute(cmd)
                 mydb.commit()
                 print("Account Updated")
                 break
@@ -298,6 +302,7 @@ while True:
     ch=input("Enter your Choice : ")
     if ch=="1":
         Create()
+
     elif ch=="2":
         #while True:
             MenuSort()
@@ -314,23 +319,46 @@ while True:
             else:
                 print("Invalid choice")
             input("Press enter to continue.")
+
     elif ch=="3":
+        clear()
+        print("*"*130)
+        print("MAIN MENU>>>SEARCH RECORDS\n".center(130))
+        print("*"*130)
         DispSearchAcc()
+
     elif ch=="4":
+        clear()
+        print("*"*130)
+        print("MAIN MENU>>>UPDATE RECORDS\n".center(130))
+        print("*"*130)
         Update()
+
     elif ch=="5":
+        clear()
+        print("*"*130)
+        print("MAIN MENU>>>DELETE RECORDS\n".center(130))
+        print("*"*130)
         Delete()
+
     elif ch=="6":
         while True:
             MenuTransaction()
             ch1=input("Enter choice a/b/c : ")
             clear
             if ch1 in ['a','A']:
+                print("*"*130)
+                print("MAIN MENU>>>TRANSACTIONS>>>DEBIT\n".center(130))
                 Debit()
+
             elif ch1 in ['b','B']:
+                print("*"*130)
+                print("MAIN MENU>>>TRANSACTIONS>CREDIT\n".center(130))
                 Credit()
+
             elif ch1 in ['c','C']:
                 break
+
             else:
                 print("Invalid choice")
             input("Press enter to continue.")
@@ -338,5 +366,6 @@ while True:
     elif ch=="7":
         print("Exiting...")
         break
+
     else:
         print("Wrong Choice Entered")
